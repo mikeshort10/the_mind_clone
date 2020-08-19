@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "file": "bundle.css",
+  "sources": [
+    "../../Tailwind.svelte"
+  ],
+  "sourcesContent": [
+    "<style global>\n  @tailwind base;\n  @tailwind components;\n  @tailwind utilities;\n</style>"
+  ],
+  "names": [],
+  "mappings": "AACE,UAAU,IAAI,CAAC,AACf,UAAU,UAAU,CAAC,AACrB,UAAU,SAAS,CAAC"
+}
