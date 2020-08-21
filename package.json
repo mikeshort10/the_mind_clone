@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint packages/*",
-    "dev": "concurrently \"cd packages/server && yarn server_dev\" \"cd packages/frontend && yarn dev\""
+    "dev": "concurrently \"cd packages/server && yarn server_dev\" \"cd packages/frontend && yarn dev\"",
+    "bootstrap": "yarn lerna bootstrap"
   },
   "devDependencies": {
     "@tsconfig/svelte": "^1.0.10",
