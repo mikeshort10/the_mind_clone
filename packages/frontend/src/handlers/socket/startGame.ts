@@ -9,6 +9,7 @@ export const onStartGame = (
     fn(data);
   });
   return (code: string) => {
+    console.log(code);
     socket.emit(action, { code });
   };
 };

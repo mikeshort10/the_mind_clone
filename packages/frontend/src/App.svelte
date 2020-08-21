@@ -12,22 +12,31 @@
   const socket = createConnection();
 
   let game;
-  let name;
+  let name = window.sessionStorage.getItem("playerName") || "";
+  let hand;
 
   const updateName = (playerName) => {
     name = playerName;
+    window.sessionStorage.setItem("playerName", playerName);
+  };
+
+  const updateGame = (data) => {
+    data.game && (game = data.game);
+  };
+
+  const setHand = (data) => {
+    data.hand && (hand = data.hand.sort());
   };
 
   socket.on("JOIN_GAME", (data) => {
-    console.log("updating");
-    navigate;
-    game = data.game;
+    updateGame(data);
     navigate(`/${data.code}`);
   });
 
-  const updateGame = ({ game: gameData }) => {
-    game = gameData;
-  };
+  socket.on("START_GAME", (data) => {
+    updateGame(data);
+    setHand(data);
+  });
 
   const getGame = onGetGame(socket, updateGame);
   const startGame = onStartGame(socket, updateGame);
@@ -46,9 +55,11 @@
       {#if game == null || game.status === 'join'}
         <WaitScreen {params} {game} {getGame} {name} {startGame} />
       {:else}
-        <PlayScreen {game} />
+        <PlayScreen {game} {hand} />
       {/if}
     </Route>
-    <Route path="/" component={StartPage} {name} {updateName} />
+    <Route path="/">
+      <StartPage {name} {updateName} />
+    </Route>
   </main>
 </Router>

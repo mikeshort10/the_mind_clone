@@ -6,12 +6,9 @@ export const onGetGame = (
 ) => {
   const action = "GET_GAME";
   socket.on(action, (data: EmitData) => {
-    console.log("receiving game");
     fn(data);
   });
-  console.log("creating getGame");
   return (code: string) => {
-    console.log("calling getGame");
     socket.emit(action, { code });
   };
 };

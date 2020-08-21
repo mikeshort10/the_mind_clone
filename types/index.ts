@@ -13,6 +13,8 @@ export type Game = {
   dealtCards: number[];
 };
 
+export type Games = Record<string, Game>;
+
 export type EmitData = {
   code: string;
   game?: Game;

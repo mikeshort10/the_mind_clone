@@ -2,9 +2,10 @@ import { Game, Hand } from "../../..//types";
 import { A, O } from "../../../fp";
 import { pipe } from "fp-ts/lib/function";
 
-export const dealCards = ({ players, dealtCards }: Game) => {
+export const dealCards = (game: Game): [Hand[], Game] => {
+  const { players, dealtCards } = game;
   const totalPlayers = players.length;
-  return A.array.reduceWithIndex(
+  const hands = A.array.reduceWithIndex(
     dealtCards,
     A.makeBy(totalPlayers, (): Hand => []),
     (i, acc, card) => {
@@ -15,4 +16,5 @@ export const dealCards = ({ players, dealtCards }: Game) => {
       );
     }
   );
+  return [hands, game];
 };

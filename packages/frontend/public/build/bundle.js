@@ -2818,16 +2818,76 @@ var app = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[5] = list[i];
+    	child_ctx[7] = list[i];
     	return child_ctx;
     }
 
-    // (11:4) {#if game}
+    // (15:2) {:else}
+    function create_else_block$1(ctx) {
+    	let p;
+
+    	const block = {
+    		c: function create() {
+    			p = element("p");
+    			p.textContent = "Invalid Game Code";
+    			attr_dev(p, "class", "text-center text-red-500");
+    			add_location(p, file$4, 15, 4, 361);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, p, anchor);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(p);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_else_block$1.name,
+    		type: "else",
+    		source: "(15:2) {:else}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (13:2) {#if game}
+    function create_if_block_2(ctx) {
+    	let p;
+
+    	const block = {
+    		c: function create() {
+    			p = element("p");
+    			p.textContent = "Waiting for Other Players";
+    			attr_dev(p, "class", "text-center");
+    			add_location(p, file$4, 13, 4, 294);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, p, anchor);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(p);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block_2.name,
+    		type: "if",
+    		source: "(13:2) {#if game}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (20:4) {#if game}
     function create_if_block$2(ctx) {
     	let t;
     	let if_block_anchor;
     	let current;
-    	let each_value = /*game*/ ctx[1].players;
+    	let each_value = /*game*/ ctx[0].players;
     	validate_each_argument(each_value);
     	let each_blocks = [];
 
@@ -2835,7 +2895,7 @@ var app = (function () {
     		each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
     	}
 
-    	let if_block = /*name*/ ctx[3] === /*game*/ ctx[1].players[0] && create_if_block_1$1(ctx);
+    	let if_block = /*name*/ ctx[1] === /*game*/ ctx[0].players[0] && create_if_block_1$1(ctx);
 
     	const block = {
     		c: function create() {
@@ -2858,8 +2918,8 @@ var app = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*game*/ 2) {
-    				each_value = /*game*/ ctx[1].players;
+    			if (dirty & /*game*/ 1) {
+    				each_value = /*game*/ ctx[0].players;
     				validate_each_argument(each_value);
     				let i;
 
@@ -2882,11 +2942,11 @@ var app = (function () {
     				each_blocks.length = each_value.length;
     			}
 
-    			if (/*name*/ ctx[3] === /*game*/ ctx[1].players[0]) {
+    			if (/*name*/ ctx[1] === /*game*/ ctx[0].players[0]) {
     				if (if_block) {
     					if_block.p(ctx, dirty);
 
-    					if (dirty & /*name, game*/ 10) {
+    					if (dirty & /*name, game*/ 3) {
     						transition_in(if_block, 1);
     					}
     				} else {
@@ -2926,31 +2986,31 @@ var app = (function () {
     		block,
     		id: create_if_block$2.name,
     		type: "if",
-    		source: "(11:4) {#if game}",
+    		source: "(20:4) {#if game}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (12:6) {#each game.players as player}
+    // (21:6) {#each game.players as player}
     function create_each_block(ctx) {
     	let p;
-    	let t_value = /*player*/ ctx[5] + "";
+    	let t_value = /*player*/ ctx[7] + "";
     	let t;
 
     	const block = {
     		c: function create() {
     			p = element("p");
     			t = text(t_value);
-    			add_location(p, file$4, 12, 8, 359);
+    			add_location(p, file$4, 21, 8, 516);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, p, anchor);
     			append_dev(p, t);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*game*/ 2 && t_value !== (t_value = /*player*/ ctx[5] + "")) set_data_dev(t, t_value);
+    			if (dirty & /*game*/ 1 && t_value !== (t_value = /*player*/ ctx[7] + "")) set_data_dev(t, t_value);
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(p);
@@ -2961,21 +3021,21 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(12:6) {#each game.players as player}",
+    		source: "(21:6) {#each game.players as player}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (15:6) {#if name === game.players[0]}
+    // (24:6) {#if name === game.players[0]}
     function create_if_block_1$1(ctx) {
     	let button;
     	let current;
 
     	button = new Button({
     			props: {
-    				onClick: /*startGame*/ ctx[2],
+    				onClick: /*start*/ ctx[3],
     				$$slots: { default: [create_default_slot$1] },
     				$$scope: { ctx }
     			},
@@ -2992,9 +3052,8 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const button_changes = {};
-    			if (dirty & /*startGame*/ 4) button_changes.onClick = /*startGame*/ ctx[2];
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 1024) {
     				button_changes.$$scope = { dirty, ctx };
     			}
 
@@ -3018,14 +3077,14 @@ var app = (function () {
     		block,
     		id: create_if_block_1$1.name,
     		type: "if",
-    		source: "(15:6) {#if name === game.players[0]}",
+    		source: "(24:6) {#if name === game.players[0]}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (16:8) <Button onClick={startGame}>
+    // (25:8) <Button onClick={start}>
     function create_default_slot$1(ctx) {
     	let t;
 
@@ -3045,7 +3104,7 @@ var app = (function () {
     		block,
     		id: create_default_slot$1.name,
     		type: "slot",
-    		source: "(16:8) <Button onClick={startGame}>",
+    		source: "(25:8) <Button onClick={start}>",
     		ctx
     	});
 
@@ -3055,33 +3114,35 @@ var app = (function () {
     function create_fragment$7(ctx) {
     	let div1;
     	let h2;
-    	let t0_value = /*params*/ ctx[0].code + "";
-    	let t0;
     	let t1;
-    	let p;
-    	let t3;
+    	let t2;
     	let div0;
     	let current;
-    	let if_block = /*game*/ ctx[1] && create_if_block$2(ctx);
+
+    	function select_block_type(ctx, dirty) {
+    		if (/*game*/ ctx[0]) return create_if_block_2;
+    		return create_else_block$1;
+    	}
+
+    	let current_block_type = select_block_type(ctx);
+    	let if_block0 = current_block_type(ctx);
+    	let if_block1 = /*game*/ ctx[0] && create_if_block$2(ctx);
 
     	const block = {
     		c: function create() {
     			div1 = element("div");
     			h2 = element("h2");
-    			t0 = text(t0_value);
+    			h2.textContent = `${/*code*/ ctx[2]}`;
     			t1 = space();
-    			p = element("p");
-    			p.textContent = "Waiting for Other Players";
-    			t3 = space();
+    			if_block0.c();
+    			t2 = space();
     			div0 = element("div");
-    			if (if_block) if_block.c();
+    			if (if_block1) if_block1.c();
     			attr_dev(h2, "class", "text-xl text-center");
-    			add_location(h2, file$4, 7, 2, 165);
-    			attr_dev(p, "class", "text-center");
-    			add_location(p, file$4, 8, 2, 218);
+    			add_location(h2, file$4, 11, 2, 233);
     			attr_dev(div0, "class", "text-center");
-    			add_location(div0, file$4, 9, 2, 273);
-    			add_location(div1, file$4, 6, 0, 157);
+    			add_location(div0, file$4, 18, 2, 430);
+    			add_location(div1, file$4, 10, 0, 225);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3089,35 +3150,42 @@ var app = (function () {
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
     			append_dev(div1, h2);
-    			append_dev(h2, t0);
     			append_dev(div1, t1);
-    			append_dev(div1, p);
-    			append_dev(div1, t3);
+    			if_block0.m(div1, null);
+    			append_dev(div1, t2);
     			append_dev(div1, div0);
-    			if (if_block) if_block.m(div0, null);
+    			if (if_block1) if_block1.m(div0, null);
     			current = true;
     		},
     		p: function update(ctx, [dirty]) {
-    			if ((!current || dirty & /*params*/ 1) && t0_value !== (t0_value = /*params*/ ctx[0].code + "")) set_data_dev(t0, t0_value);
+    			if (current_block_type !== (current_block_type = select_block_type(ctx))) {
+    				if_block0.d(1);
+    				if_block0 = current_block_type(ctx);
 
-    			if (/*game*/ ctx[1]) {
-    				if (if_block) {
-    					if_block.p(ctx, dirty);
+    				if (if_block0) {
+    					if_block0.c();
+    					if_block0.m(div1, t2);
+    				}
+    			}
 
-    					if (dirty & /*game*/ 2) {
-    						transition_in(if_block, 1);
+    			if (/*game*/ ctx[0]) {
+    				if (if_block1) {
+    					if_block1.p(ctx, dirty);
+
+    					if (dirty & /*game*/ 1) {
+    						transition_in(if_block1, 1);
     					}
     				} else {
-    					if_block = create_if_block$2(ctx);
-    					if_block.c();
-    					transition_in(if_block, 1);
-    					if_block.m(div0, null);
+    					if_block1 = create_if_block$2(ctx);
+    					if_block1.c();
+    					transition_in(if_block1, 1);
+    					if_block1.m(div0, null);
     				}
-    			} else if (if_block) {
+    			} else if (if_block1) {
     				group_outros();
 
-    				transition_out(if_block, 1, 1, () => {
-    					if_block = null;
+    				transition_out(if_block1, 1, 1, () => {
+    					if_block1 = null;
     				});
 
     				check_outros();
@@ -3125,16 +3193,17 @@ var app = (function () {
     		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(if_block);
+    			transition_in(if_block1);
     			current = true;
     		},
     		o: function outro(local) {
-    			transition_out(if_block);
+    			transition_out(if_block1);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(div1);
-    			if (if_block) if_block.d();
+    			if_block0.d();
+    			if (if_block1) if_block1.d();
     		}
     	};
 
@@ -3157,6 +3226,8 @@ var app = (function () {
     		{ name } = $$props;
 
     	game || getGame(params.code);
+    	const { code } = params;
+    	const start = () => startGame(code);
     	const writable_props = ["params", "game", "getGame", "startGame", "name"];
 
     	Object.keys($$props).forEach(key => {
@@ -3167,11 +3238,11 @@ var app = (function () {
     	validate_slots("WaitScreen", $$slots, []);
 
     	$$self.$$set = $$props => {
-    		if ("params" in $$props) $$invalidate(0, params = $$props.params);
-    		if ("game" in $$props) $$invalidate(1, game = $$props.game);
-    		if ("getGame" in $$props) $$invalidate(4, getGame = $$props.getGame);
-    		if ("startGame" in $$props) $$invalidate(2, startGame = $$props.startGame);
-    		if ("name" in $$props) $$invalidate(3, name = $$props.name);
+    		if ("params" in $$props) $$invalidate(4, params = $$props.params);
+    		if ("game" in $$props) $$invalidate(0, game = $$props.game);
+    		if ("getGame" in $$props) $$invalidate(5, getGame = $$props.getGame);
+    		if ("startGame" in $$props) $$invalidate(6, startGame = $$props.startGame);
+    		if ("name" in $$props) $$invalidate(1, name = $$props.name);
     	};
 
     	$$self.$capture_state = () => ({
@@ -3180,22 +3251,24 @@ var app = (function () {
     		getGame,
     		startGame,
     		name,
-    		Button
+    		Button,
+    		code,
+    		start
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ("params" in $$props) $$invalidate(0, params = $$props.params);
-    		if ("game" in $$props) $$invalidate(1, game = $$props.game);
-    		if ("getGame" in $$props) $$invalidate(4, getGame = $$props.getGame);
-    		if ("startGame" in $$props) $$invalidate(2, startGame = $$props.startGame);
-    		if ("name" in $$props) $$invalidate(3, name = $$props.name);
+    		if ("params" in $$props) $$invalidate(4, params = $$props.params);
+    		if ("game" in $$props) $$invalidate(0, game = $$props.game);
+    		if ("getGame" in $$props) $$invalidate(5, getGame = $$props.getGame);
+    		if ("startGame" in $$props) $$invalidate(6, startGame = $$props.startGame);
+    		if ("name" in $$props) $$invalidate(1, name = $$props.name);
     	};
 
     	if ($$props && "$$inject" in $$props) {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [params, game, startGame, name, getGame];
+    	return [game, name, code, start, params, getGame, startGame];
     }
 
     class WaitScreen extends SvelteComponentDev {
@@ -3203,11 +3276,11 @@ var app = (function () {
     		super(options);
 
     		init(this, options, instance$7, create_fragment$7, safe_not_equal, {
-    			params: 0,
-    			game: 1,
-    			getGame: 4,
-    			startGame: 2,
-    			name: 3
+    			params: 4,
+    			game: 0,
+    			getGame: 5,
+    			startGame: 6,
+    			name: 1
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -3220,23 +3293,23 @@ var app = (function () {
     		const { ctx } = this.$$;
     		const props = options.props || {};
 
-    		if (/*params*/ ctx[0] === undefined && !("params" in props)) {
+    		if (/*params*/ ctx[4] === undefined && !("params" in props)) {
     			console.warn("<WaitScreen> was created without expected prop 'params'");
     		}
 
-    		if (/*game*/ ctx[1] === undefined && !("game" in props)) {
+    		if (/*game*/ ctx[0] === undefined && !("game" in props)) {
     			console.warn("<WaitScreen> was created without expected prop 'game'");
     		}
 
-    		if (/*getGame*/ ctx[4] === undefined && !("getGame" in props)) {
+    		if (/*getGame*/ ctx[5] === undefined && !("getGame" in props)) {
     			console.warn("<WaitScreen> was created without expected prop 'getGame'");
     		}
 
-    		if (/*startGame*/ ctx[2] === undefined && !("startGame" in props)) {
+    		if (/*startGame*/ ctx[6] === undefined && !("startGame" in props)) {
     			console.warn("<WaitScreen> was created without expected prop 'startGame'");
     		}
 
-    		if (/*name*/ ctx[3] === undefined && !("name" in props)) {
+    		if (/*name*/ ctx[1] === undefined && !("name" in props)) {
     			console.warn("<WaitScreen> was created without expected prop 'name'");
     		}
     	}
@@ -3285,12 +3358,9 @@ var app = (function () {
     const onGetGame = (socket, fn) => {
         const action = "GET_GAME";
         socket.on(action, (data) => {
-            console.log("receiving game");
             fn(data);
         });
-        console.log("creating getGame");
         return (code) => {
-            console.log("calling getGame");
             socket.emit(action, { code });
         };
     };
@@ -3301,6 +3371,7 @@ var app = (function () {
             fn(data);
         });
         return (code) => {
+            console.log(code);
             socket.emit(action, { code });
         };
     };
@@ -3310,7 +3381,7 @@ var app = (function () {
     const file$5 = "src/views/PlayScreen.svelte";
 
     // (8:2) {:else}
-    function create_else_block$1(ctx) {
+    function create_else_block$2(ctx) {
     	let p;
     	let t_value = /*game*/ ctx[0].dealtCards[/*game*/ ctx[0].lastPlayedIndex] + "";
     	let t;
@@ -3335,7 +3406,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$1.name,
+    		id: create_else_block$2.name,
     		type: "else",
     		source: "(8:2) {:else}",
     		ctx
@@ -3379,7 +3450,7 @@ var app = (function () {
 
     	function select_block_type(ctx, dirty) {
     		if (/*game*/ ctx[0].lastPlayedIndex === -1) return create_if_block$3;
-    		return create_else_block$1;
+    		return create_else_block$2;
     	}
 
     	let current_block_type = select_block_type(ctx);
@@ -3506,13 +3577,16 @@ var app = (function () {
     const { console: console_1 } = globals;
     const file$6 = "src/App.svelte";
 
-    // (48:6) {:else}
-    function create_else_block$2(ctx) {
+    // (57:6) {:else}
+    function create_else_block$3(ctx) {
     	let playscreen;
     	let current;
 
     	playscreen = new PlayScreen({
-    			props: { game: /*game*/ ctx[1] },
+    			props: {
+    				game: /*game*/ ctx[1],
+    				hand: /*hand*/ ctx[3]
+    			},
     			$$inline: true
     		});
 
@@ -3527,6 +3601,7 @@ var app = (function () {
     		p: function update(ctx, dirty) {
     			const playscreen_changes = {};
     			if (dirty & /*game*/ 2) playscreen_changes.game = /*game*/ ctx[1];
+    			if (dirty & /*hand*/ 8) playscreen_changes.hand = /*hand*/ ctx[3];
     			playscreen.$set(playscreen_changes);
     		},
     		i: function intro(local) {
@@ -3545,27 +3620,27 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$2.name,
+    		id: create_else_block$3.name,
     		type: "else",
-    		source: "(48:6) {:else}",
+    		source: "(57:6) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (46:6) {#if game == null || game.status === 'join'}
+    // (55:6) {#if game == null || game.status === 'join'}
     function create_if_block$4(ctx) {
     	let waitscreen;
     	let current;
 
     	waitscreen = new WaitScreen({
     			props: {
-    				params: /*params*/ ctx[8],
+    				params: /*params*/ ctx[10],
     				game: /*game*/ ctx[1],
-    				getGame: /*getGame*/ ctx[4],
+    				getGame: /*getGame*/ ctx[5],
     				name: /*name*/ ctx[2],
-    				startGame: /*startGame*/ ctx[5]
+    				startGame: /*startGame*/ ctx[6]
     			},
     			$$inline: true
     		});
@@ -3580,7 +3655,7 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const waitscreen_changes = {};
-    			if (dirty & /*params*/ 256) waitscreen_changes.params = /*params*/ ctx[8];
+    			if (dirty & /*params*/ 1024) waitscreen_changes.params = /*params*/ ctx[10];
     			if (dirty & /*game*/ 2) waitscreen_changes.game = /*game*/ ctx[1];
     			if (dirty & /*name*/ 4) waitscreen_changes.name = /*name*/ ctx[2];
     			waitscreen.$set(waitscreen_changes);
@@ -3603,20 +3678,20 @@ var app = (function () {
     		block,
     		id: create_if_block$4.name,
     		type: "if",
-    		source: "(46:6) {#if game == null || game.status === 'join'}",
+    		source: "(55:6) {#if game == null || game.status === 'join'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (45:4) <Route path="/:code" let:params>
-    function create_default_slot_1$1(ctx) {
+    // (54:4) <Route path="/:code" let:params>
+    function create_default_slot_2$1(ctx) {
     	let current_block_type_index;
     	let if_block;
     	let if_block_anchor;
     	let current;
-    	const if_block_creators = [create_if_block$4, create_else_block$2];
+    	const if_block_creators = [create_if_block$4, create_else_block$3];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
@@ -3679,16 +3754,67 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_1$1.name,
+    		id: create_default_slot_2$1.name,
     		type: "slot",
-    		source: "(45:4) <Route path=\\\"/:code\\\" let:params>",
+    		source: "(54:4) <Route path=\\\"/:code\\\" let:params>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (42:0) <Router {url}>
+    // (61:4) <Route path="/">
+    function create_default_slot_1$1(ctx) {
+    	let startpage;
+    	let current;
+
+    	startpage = new StartPage({
+    			props: {
+    				name: /*name*/ ctx[2],
+    				updateName: /*updateName*/ ctx[4]
+    			},
+    			$$inline: true
+    		});
+
+    	const block = {
+    		c: function create() {
+    			create_component(startpage.$$.fragment);
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(startpage, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			const startpage_changes = {};
+    			if (dirty & /*name*/ 4) startpage_changes.name = /*name*/ ctx[2];
+    			startpage.$set(startpage_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(startpage.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(startpage.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(startpage, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot_1$1.name,
+    		type: "slot",
+    		source: "(61:4) <Route path=\\\"/\\\">",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (51:0) <Router {url}>
     function create_default_slot$2(ctx) {
     	let main;
     	let tailwind;
@@ -3704,9 +3830,9 @@ var app = (function () {
     				path: "/:code",
     				$$slots: {
     					default: [
-    						create_default_slot_1$1,
-    						({ params }) => ({ 8: params }),
-    						({ params }) => params ? 256 : 0
+    						create_default_slot_2$1,
+    						({ params }) => ({ 10: params }),
+    						({ params }) => params ? 1024 : 0
     					]
     				},
     				$$scope: { ctx }
@@ -3717,9 +3843,8 @@ var app = (function () {
     	route1 = new Route({
     			props: {
     				path: "/",
-    				component: StartPage,
-    				name: /*name*/ ctx[2],
-    				updateName: /*updateName*/ ctx[3]
+    				$$slots: { default: [create_default_slot_1$1] },
+    				$$scope: { ctx }
     			},
     			$$inline: true
     		});
@@ -3732,7 +3857,7 @@ var app = (function () {
     			create_component(route0.$$.fragment);
     			t1 = space();
     			create_component(route1.$$.fragment);
-    			add_location(main, file$6, 42, 2, 1051);
+    			add_location(main, file$6, 51, 2, 1301);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, main, anchor);
@@ -3746,13 +3871,17 @@ var app = (function () {
     		p: function update(ctx, dirty) {
     			const route0_changes = {};
 
-    			if (dirty & /*$$scope, params, game, name*/ 774) {
+    			if (dirty & /*$$scope, params, game, name, hand*/ 3086) {
     				route0_changes.$$scope = { dirty, ctx };
     			}
 
     			route0.$set(route0_changes);
     			const route1_changes = {};
-    			if (dirty & /*name*/ 4) route1_changes.name = /*name*/ ctx[2];
+
+    			if (dirty & /*$$scope, name*/ 2052) {
+    				route1_changes.$$scope = { dirty, ctx };
+    			}
+
     			route1.$set(route1_changes);
     		},
     		i: function intro(local) {
@@ -3780,7 +3909,7 @@ var app = (function () {
     		block,
     		id: create_default_slot$2.name,
     		type: "slot",
-    		source: "(42:0) <Router {url}>",
+    		source: "(51:0) <Router {url}>",
     		ctx
     	});
 
@@ -3815,7 +3944,7 @@ var app = (function () {
     			const router_changes = {};
     			if (dirty & /*url*/ 1) router_changes.url = /*url*/ ctx[0];
 
-    			if (dirty & /*$$scope, name, game*/ 518) {
+    			if (dirty & /*$$scope, name, game, hand*/ 2062) {
     				router_changes.$$scope = { dirty, ctx };
     			}
 
@@ -3849,21 +3978,31 @@ var app = (function () {
     function instance$9($$self, $$props, $$invalidate) {
     	const socket = createConnection();
     	let game;
-    	let name;
+    	let name = window.sessionStorage.getItem("playerName") || "";
+    	let hand;
 
     	const updateName = playerName => {
     		$$invalidate(2, name = playerName);
+    		window.sessionStorage.setItem("playerName", playerName);
+    	};
+
+    	const updateGame = data => {
+    		data.game && $$invalidate(1, game = data.game);
+    	};
+
+    	const setHand = data => {
+    		data.hand && $$invalidate(3, hand = data.hand.sort());
     	};
 
     	socket.on("JOIN_GAME", data => {
-    		console.log("updating");
-    		$$invalidate(1, game = data.game);
+    		updateGame(data);
     		navigate(`/${data.code}`);
     	});
 
-    	const updateGame = ({ game: gameData }) => {
-    		$$invalidate(1, game = gameData);
-    	};
+    	socket.on("START_GAME", data => {
+    		updateGame(data);
+    		setHand(data);
+    	});
 
     	const getGame = onGetGame(socket, updateGame);
     	const startGame = onStartGame(socket, updateGame);
@@ -3900,8 +4039,10 @@ var app = (function () {
     		socket,
     		game,
     		name,
+    		hand,
     		updateName,
     		updateGame,
+    		setHand,
     		getGame,
     		startGame,
     		url
@@ -3910,6 +4051,7 @@ var app = (function () {
     	$$self.$inject_state = $$props => {
     		if ("game" in $$props) $$invalidate(1, game = $$props.game);
     		if ("name" in $$props) $$invalidate(2, name = $$props.name);
+    		if ("hand" in $$props) $$invalidate(3, hand = $$props.hand);
     		if ("url" in $$props) $$invalidate(0, url = $$props.url);
     	};
 
@@ -3917,7 +4059,7 @@ var app = (function () {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [url, game, name, updateName, getGame, startGame];
+    	return [url, game, name, hand, updateName, getGame, startGame];
     }
 
     class App extends SvelteComponentDev {
