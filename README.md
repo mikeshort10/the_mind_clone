@@ -7,4 +7,5 @@ Application for playing the card game, The Mind, by [Pandasaurus Games](https://
   cd the_mind
   yarn bootstrap
   yarn dev
+
 ```
