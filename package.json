@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint packages/*"
+    "lint": "eslint packages/*",
+    "dev": "concurrently \"cd packages/server && yarn server_dev\" \"cd packages/frontend && yarn dev\""
   },
   "devDependencies": {
     "@tsconfig/svelte": "^1.0.10",
@@ -25,6 +26,7 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
+    "concurrently": "^5.3.0",
     "dotenv": "^8.2.0",
     "fp-ts": "^2.8.1",
     "lerna": "^3.22.1"
