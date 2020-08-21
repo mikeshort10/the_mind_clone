@@ -1,16 +1,15 @@
 import { Socket } from "socket.io";
 import { generateGameCode } from "../generateGameCode";
-import { Action, actions, Game, Games } from "../../../../types";
+import { Action, actions, Games } from "../../../../types";
 import { safeGenerateGame } from "../generateGame";
-import { emitFromSocket } from "../emitFromSocket";
+import { updateGames } from "../updateGames";
 
 export const createGame = (games: Games, socket: Socket) => {
-  const emit = emitFromSocket(socket);
   return (action: Action) => {
-    console.log("creating game");
     const code = generateGameCode(games);
-    games[code] = safeGenerateGame(action.playerName, games[code]);
+    // eslint-disable-next-line functional/no-expression-statement
+    updateGames(games)(safeGenerateGame(action.playerName, games[code]), code);
     socket.join(code);
-    emit(actions.CREATE_GAME, { game: games[code], code });
+    socket.emit(actions.CREATE_GAME, { game: games[code], code });
   };
 };

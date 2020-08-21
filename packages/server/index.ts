@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-expression-statement */
 import http from "http";
 import https from "https";
 import * as dotenv from "dotenv";

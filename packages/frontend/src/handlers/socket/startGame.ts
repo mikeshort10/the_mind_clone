@@ -2,14 +2,11 @@ import { EmitData } from "../../../../../types";
 
 export const onStartGame = (
   socket: SocketIOClient.Socket,
-  fn: (x: EmitData) => void
+  fn: (x: EmitData) => void,
 ) => {
   const action = "START_GAME";
-  socket.on(action, (data: EmitData) => {
-    fn(data);
-  });
+  socket.on(action, fn);
   return (code: string) => {
-    console.log(code);
     socket.emit(action, { code });
   };
 };

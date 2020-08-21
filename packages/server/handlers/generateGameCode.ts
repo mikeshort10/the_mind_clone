@@ -1,7 +1,7 @@
 import { flow, pipe } from "fp-ts/lib/function";
 import { randomInt } from "fp-ts/lib/Random";
 import { A, R, O } from "../../../fp";
-import { Game, Games } from "../../../types";
+import { Games } from "../../../types";
 
 const randomLetter = flow(randomInt(65, 90), (x: number) =>
   String.fromCharCode(x)

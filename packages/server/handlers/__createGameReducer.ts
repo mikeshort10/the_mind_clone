@@ -1,5 +1,4 @@
-import { Game, Games } from "../../../types";
-import { ReadonlyRecord } from "fp-ts/lib/ReadonlyRecord";
+import { Games } from "../../../types";
 import { pipe } from "fp-ts/lib/function";
 import { R, O } from "../../../fp";
 

@@ -13,10 +13,10 @@ const hasBeenDealt = (card: number, game: Game): boolean =>
 
 export const getCardsToDeal = (game: Game): Game => {
   const card = randomInt(1, TOTAL_CARDS)();
-  if (areAllCardsDealt(game)) {
-    return game;
-  } else if (hasBeenDealt(card, game)) {
-    return getCardsToDeal(game);
-  }
-  return getCardsToDeal({ ...game, dealtCards: [...game.dealtCards, card] });
+
+  const updatedGame = hasBeenDealt(card, game)
+    ? game
+    : { ...game, dealtCards: [...game.dealtCards, card] };
+
+  return areAllCardsDealt(game) ? game : getCardsToDeal(updatedGame);
 };

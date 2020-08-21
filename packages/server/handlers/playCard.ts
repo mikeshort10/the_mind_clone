@@ -9,7 +9,7 @@ const getCardIndex = (card: number, game: Game): number =>
     getOrElse(() => game.lastPlayedIndex)
   );
 
-const handleCorrectOrder = ([game, card]: [Game, number]) => {
+const handleCorrectOrder = ([game, card]: readonly [Game, number]) => {
   return { ...game, lastPlayedIndex: getCardIndex(card, game) };
 };
 
@@ -17,7 +17,7 @@ const handleMistake = (game: Game) => {
   return { ...game, mistakes: game.mistakes + 1 };
 };
 
-const isCorrectOrder = ([game, card]: [Game, number]) =>
+const isCorrectOrder = ([game, card]: readonly [Game, number]) =>
   game.dealtCards[game.lastPlayedIndex + 1] === card;
 
 const getRoundsToWin = (numberOfPlayers: number) => {
@@ -54,7 +54,7 @@ export const playCard = ({ card }: Action) => (game: Game) => {
   return pipe(
     card,
     O.fromNullable,
-    O.map((card): [Game, number] => [game, card]),
+    O.map((card): readonly [Game, number] => [game, card]),
     O.chain(O.fromPredicate(isCorrectOrder)),
     O.map(handleCorrectOrder),
     O.getOrElse(() => handleMistake(game)),

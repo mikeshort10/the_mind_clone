@@ -2,7 +2,7 @@ import { Game, Hand } from "../../..//types";
 import { A, O } from "../../../fp";
 import { pipe } from "fp-ts/lib/function";
 
-export const dealCards = (game: Game): [Hand[], Game] => {
+export const dealCards = (game: Game): readonly [readonly Hand[], Game] => {
   const { players, dealtCards } = game;
   const totalPlayers = players.length;
   const hands = A.array.reduceWithIndex(

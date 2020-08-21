@@ -5,7 +5,7 @@ export const configureSocket = (): SocketIOClient.Socket => {
   const socket = createConnection();
 
   socket.on("CLIENT_ERROR", ({ error }: EmitData) => {
-    console.log(error);
+    console.error(error);
   });
 
   return socket;
