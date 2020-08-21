@@ -3,6 +3,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import livereload from "rollup-plugin-livereload";
 import { terser } from "rollup-plugin-terser";
+// import serve from "rollup-plugin-serve";
 import sveltePreprocess from "svelte-preprocess";
 import typescript from "@rollup/plugin-typescript";
 
@@ -48,10 +49,11 @@ export default {
       extensions: [".svelte"],
       // we'll extract any component CSS out into
       // a separate file - better for performance,
-      // css: (css) => {
-      //   css.write("public/build/bundle.css");
-      // },
+
       preprocess: sveltePreprocess({ postcss: true }),
+      css: (css) => {
+        css.write("public/build/bundle.css");
+      },
     }),
 
     typescript({ sourceMap: !production }),

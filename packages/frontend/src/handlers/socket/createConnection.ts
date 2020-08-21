@@ -1,10 +1,6 @@
-// import io from "socket.io-client";
-import type { EmitData } from "../../../../../types";
+import type { EmitData } from "../../../../..//types";
+import type { Socket } from "socket.io-client";
+declare var io: (url: string) => typeof Socket;
 
-export const createConnection = () => {
-  // const socket = io();
-  // socket.on("START_GAME", ({ game }: EmitData) => {
-  //   console.log(game);
-  // });
-  // return socket;
-};
+export const createConnection = (): typeof Socket =>
+  io("http://localhost:3000");

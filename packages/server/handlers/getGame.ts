@@ -1,4 +1,4 @@
-import { Action, Game } from "../../../types";
+import { Action, Game } from "../../..//types";
 import { R } from "../../../fp";
 
 export const getGame = (games: Record<string, Game>) => {

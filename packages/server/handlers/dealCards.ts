@@ -1,4 +1,4 @@
-import { Game, Hand } from "../../../types";
+import { Game, Hand } from "../../..//types";
 import { A, O } from "../../../fp";
 import { pipe } from "fp-ts/lib/function";
 

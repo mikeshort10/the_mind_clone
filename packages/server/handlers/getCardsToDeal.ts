@@ -1,4 +1,4 @@
-import { Game } from "../../../types";
+import { Game } from "../../..//types";
 import { A } from "../../../fp";
 import { randomInt } from "fp-ts/lib/Random";
 import { eqNumber } from "fp-ts/lib/Eq";

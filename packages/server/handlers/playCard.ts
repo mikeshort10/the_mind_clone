@@ -1,4 +1,4 @@
-import { Action, Game } from "../../../types";
+import { Action, Game } from "../../..//types";
 import { pipe, increment } from "fp-ts/lib/function";
 import { O, A } from "../../../fp";
 import { getOrElse } from "fp-ts/lib/Option";

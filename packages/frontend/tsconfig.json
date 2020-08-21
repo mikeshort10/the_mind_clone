@@ -1,6 +1,9 @@
 {
   "extends": "@tsconfig/svelte/tsconfig.json",
-
-  "include": ["src/**/*"],
+  "compilerOptions": {
+    "importsNotUsedAsValues": "remove",
+    "strict": true
+  },
+  "include": ["src/**/*", "../../types/actions.ts"],
   "exclude": ["node_modules/*", "dist/*"]
 }

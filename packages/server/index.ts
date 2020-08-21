@@ -7,7 +7,7 @@ import { randomInt } from "fp-ts/lib/Random";
 import * as A from "fp-ts/lib/Array";
 import { Game, ActionType, actions, Action, Hand, EmitData } from "../../types";
 import { safeGenerateGame } from "./handlers/generateGame";
-import { pipe } from "fp-ts/lib/function";
+import { pipe, flow } from "fp-ts/lib/function";
 import * as O from "fp-ts/lib/Option";
 import * as R from "fp-ts/lib/Record";
 import { ReadonlyRecord } from "fp-ts/lib/ReadonlyRecord";
@@ -45,15 +45,18 @@ const io = socketIO(server);
 
 const games: Record<string, Game> = {};
 
-const randomLetter = randomInt(65, 90);
+const randomLetter = flow(randomInt(65, 90), (x: number) =>
+  String.fromCharCode(x)
+);
 
 const generateGameCode = (): string => {
-  const gameCode = A.makeBy(4, randomLetter).join();
+  const gameCode = A.makeBy(4, randomLetter).join("");
   return games[gameCode] == null ? gameCode : generateGameCode();
 };
 
 const emitFromSocket = (socket: SocketIO.Socket) => {
-  return <M>(type: ActionType, message: M): void => {
+  return (type: ActionType, message: EmitData): void => {
+    console.log("emitting", type);
     socket.emit(type, message);
   };
 };
@@ -67,6 +70,7 @@ const addPlayerToGame = (games: Record<string, Game>) => {
     if (playerName == null) {
       return games[code];
     }
+    console.log(code);
     const { players, ...game } = games[code];
     return { ...game, players: [...players, playerName] };
   };
@@ -78,26 +82,45 @@ const connection = io.on("connection", (socket) => {
   console.log("connected");
 
   const emit = emitFromSocket(socket);
-  const emitAllIn = <M>(code: string, action: ActionType, payload: EmitData) =>
+  const emitAllIn = (
+    code: string,
+    action: ActionType,
+    payload: EmitData,
+    socketNewlyJoined?: true
+  ): void => {
+    socket.broadcast.emit(actions.JOIN_GAME, payload);
     emitFromSocket(socket.in(code))(action, payload);
+    socketNewlyJoined && emit(action, payload);
+    console.log(socketNewlyJoined);
+  };
 
   const socketJoin = (code: string) => socket.join(code);
 
   socket.on(actions.CREATE_GAME, ({ playerName }: Action) => {
+    console.log("starting game");
     const code = generateGameCode();
     games[code] = safeGenerateGame(playerName, games[code]);
     socketJoin(code);
-    emit(actions.CREATE_GAME, games[code]);
+    emit(actions.CREATE_GAME, { game: games[code], code });
   });
 
   socket.on(actions.JOIN_GAME, (action: Action) => {
     const { code } = action;
+    console.log(code, action.playerName);
     if (action.playerName == null) {
-      return emit(actions.CLIENT_ERROR, { error: "Please enter a username" });
+      return emit(actions.CLIENT_ERROR, {
+        code,
+        error: "Please enter a username",
+      });
     }
     games[code] = addPlayerToGame(games)(action);
-    socketJoin(code);
-    emitAllIn(code, actions.JOIN_GAME, { game: games[code], code });
+
+    console.log(games[code]);
+    emitAllIn(code, actions.JOIN_GAME, { game: games[code], code }, true);
+  });
+
+  socket.on(actions.GET_GAME, ({ code }: Action) => {
+    emit(actions.GET_GAME, { game: games[code], code });
   });
 
   socket.on(actions.START_GAME, ({ code }: Action) => {
@@ -118,7 +141,9 @@ const connection = io.on("connection", (socket) => {
       E.map((game) => {
         emitAllIn(action.code, actions.PLAY, { game, code: action.code });
       }),
-      E.getOrElse((error) => emit(actions.CLIENT_ERROR, { error }))
+      E.getOrElse((error) =>
+        emit(actions.CLIENT_ERROR, { code: action.code, error })
+      )
     );
   });
 

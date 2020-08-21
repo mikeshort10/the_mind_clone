@@ -1,0 +1,10 @@
+export const actions = {
+  CREATE_GAME: "CREATE_GAME",
+  START_GAME: "START_GAME",
+  JOIN_GAME: "JOIN_GAME",
+  MISTAKE: "MISTAKE",
+  PLAY: "PLAY",
+  STAR: "STAR",
+  CLIENT_ERROR: "CLIENT_ERROR",
+  GET_GAME: "GET_GAME",
+} as const;
