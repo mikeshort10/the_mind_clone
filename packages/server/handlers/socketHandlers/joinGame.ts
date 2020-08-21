@@ -2,7 +2,6 @@ import { Action, actions, Games } from "../../../../types";
 import { addPlayerToGame } from "../addPlayerToGame";
 import { O } from "../../../../fp";
 import { pipe } from "fp-ts/lib/function";
-import { emitToRoom } from "../emitToRoom";
 import { Namespace } from "socket.io";
 import { emitError } from "../emitError";
 import { updateGames } from "../updateGames";
@@ -12,22 +11,21 @@ export const joinGame = (
   socket: SocketIO.Socket,
   connection: Namespace,
 ) => {
-  const emitAllIn = emitToRoom(socket, connection);
   return (action: Action) => {
     const { code } = action;
     pipe(
       action.playerName,
       O.fromNullable,
-      O.map((playerName) => {
+      O.map((playerName): void => {
         // eslint-disable-next-line functional/no-expression-statement
         pipe(
           { ...action, playerName },
-          addPlayerToGame(games),
+          addPlayerToGame(games, socket.id),
+          O.map(updateGames(games)),
           O.map((game): void => {
+            socket.join(code);
             // eslint-disable-next-line functional/no-expression-statement
-            updateGames(games)(game, code);
-            // eslint-disable-next-line functional/no-expression-statement
-            emitAllIn(actions.JOIN_GAME, { game, code }, true);
+            connection.in(code).emit(actions.JOIN_GAME, { game, code });
           }),
         );
       }),

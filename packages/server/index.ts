@@ -24,7 +24,7 @@ const games: Games = {};
 const connection = io.on("connection", (socket) => {
   socket.on(actions.CREATE_GAME, createGame(games, socket));
   socket.on(actions.JOIN_GAME, joinGame(games, socket, connection));
-  socket.on(actions.START_GAME, startGame(games, socket, connection));
+  socket.on(actions.START_GAME, startGame(games, socket));
   socket.on(actions.PLAY, playCardHandler(games, socket, connection));
   socket.on(actions.GET_GAME, getGameHandler(games, socket));
 

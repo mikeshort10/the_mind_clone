@@ -1,6 +1,8 @@
 <script>
   export let params, game, getGame, startGame, name;
   import Button from "../components/Button.svelte";
+  import { isGameOwner } from "../handlers/findGameOwner";
+  import { R } from "../../../../fp";
   game || getGame(params.code);
 
   const { code } = params;
@@ -18,10 +20,10 @@
 
   <div class="text-center">
     {#if game}
-      {#each game.players as player}
-        <p>{player}</p>
+      {#each R.toArray(game.players) as [_, { playerName }]}
+        <p>{playerName}</p>
       {/each}
-      {#if name === game.players[0]}
+      {#if isGameOwner(game, name)}
         <Button onClick={start}>Start Game</Button>
       {/if}
     {/if}

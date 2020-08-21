@@ -1,11 +1,11 @@
 import { Action, actions, Games, Hand } from "../../../../types";
 import { pipe, flow } from "fp-ts/lib/function";
-import { O, R, A } from "../../../../fp";
+import { O, R } from "../../../../fp";
 import { getCardsToDeal } from "../getCardsToDeal";
 import { dealCards } from "../dealCards";
 import { Game } from "../../../../types";
-import { Namespace } from "socket.io";
 import { updateGames } from "../updateGames";
+import { snd } from "fp-ts/lib/ReadonlyTuple";
 
 const startGameByCode = (games: Games) => {
   return (code: string): O.Option<Game> => {
@@ -17,43 +17,53 @@ const startGameByCode = (games: Games) => {
   };
 };
 
-const safeGetLast = <T>(t: T) =>
-  (arr: readonly T[]) =>
-    pipe(
-      [...arr],
-      A.last,
-      O.getOrElse(() => t),
+const getPlayers = ({ players }: Game) => (players);
+
+const getSocketIds = flow(getPlayers, R.keys);
+
+const emitToAllPlayers = (
+  socket: SocketIO.Socket,
+  [hands, game]: readonly [readonly Hand[], Game],
+) =>
+  (socketIds: readonly string[]): void => {
+    console.log(socketIds);
+    return socketIds.forEach((id, i) => {
+      socket.to(id).emit(actions.START_GAME, {
+        game,
+        hand: hands[i] || [],
+      });
+    });
+  };
+
+const emitHands = (socket: SocketIO.Socket) => {
+  return (gameInfo: readonly [readonly Hand[], Game]): void => {
+    return pipe(
+      gameInfo,
+      snd,
+      getSocketIds,
+      emitToAllPlayers(socket, gameInfo),
     );
+  };
+};
+
+const dealNewRound = (socket: SocketIO.Socket, games: Games) =>
+  flow(
+    getCardsToDeal,
+    (game) => updateGames(games)(game),
+    dealCards,
+    emitHands(socket),
+  );
 
 export const startGame = (
   games: Games,
   socket: SocketIO.Socket,
-  connection: Namespace,
 ) =>
   (action: Action) => {
     const { code } = action;
     return pipe(
       code,
       startGameByCode(games),
-      O.map(getCardsToDeal),
-      O.map(
-        flow(
-          (game) => updateGames(games)(game, code),
-          dealCards,
-          ([hands, game]) => {
-            Object.keys(connection.sockets).forEach((id, i) => {
-              socket.to(id).emit(actions.START_GAME, {
-                game,
-                hand: hands[i] || [],
-              });
-            });
-            socket.emit(actions.START_GAME, {
-              game,
-              hand: safeGetLast<Hand>([])(hands),
-            });
-          },
-        ),
-      ),
+      O.map(dealNewRound(socket, games)),
       O.getOrElse(() => {
         socket.emit("CLIENT_ERROR", {
           error: `Invalid Game Code ${JSON.stringify(code)}`,

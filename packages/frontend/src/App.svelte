@@ -2,14 +2,22 @@
   import { Router, Route, navigate } from "svelte-routing";
   import Tailwind from "./Tailwind.svelte";
   import StartPage from "./views/StartPage.svelte";
-  import { createConnection } from "./handlers/socket/createConnection";
+  import { configureSocket } from "./handlers/socket/configureSocket";
   import WaitScreen from "./views/WaitScreen.svelte";
   import { onGetGame } from "./handlers/socket/getGame";
   import { onStartGame } from "./handlers/socket/startGame";
 
   import PlayScreen from "./views/PlayScreen.svelte";
 
-  const socket = createConnection();
+  const socket = configureSocket();
+
+  const emit = (type, message) => {
+    socket.emit(type, message);
+  };
+
+  socket.on("CREATE_GAME", (data) => {
+    navigate(`/${data.code}`);
+  });
 
   let game;
   let name = window.sessionStorage.getItem("playerName") || "";
@@ -25,10 +33,12 @@
   };
 
   const setHand = (data) => {
+    console.log(data);
     data.hand && (hand = data.hand.sort());
   };
 
   socket.on("JOIN_GAME", (data) => {
+    console.log("someone wants to play!");
     updateGame(data);
     navigate(`/${data.code}`);
   });
@@ -59,7 +69,7 @@
       {/if}
     </Route>
     <Route path="/">
-      <StartPage {name} {updateName} />
+      <StartPage {name} {updateName} {emit} />
     </Route>
   </main>
 </Router>

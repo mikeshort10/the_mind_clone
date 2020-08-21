@@ -1,12 +1,12 @@
 import { Action, Game } from "../../..//types";
 import { pipe, increment } from "fp-ts/lib/function";
-import { O, A } from "../../../fp";
+import { O, A, R } from "../../../fp";
 import { getOrElse } from "fp-ts/lib/Option";
 
 const getCardIndex = (card: number, game: Game): number =>
   pipe(
-    A.findIndex((x) => x === card)(game.dealtCards),
-    getOrElse(() => game.lastPlayedIndex)
+    A.findIndex((x) => x === card)([...game.dealtCards]),
+    getOrElse(() => game.lastPlayedIndex),
   );
 
 const handleCorrectOrder = ([game, card]: readonly [Game, number]) => {
@@ -25,6 +25,8 @@ const getRoundsToWin = (numberOfPlayers: number) => {
     2: 12,
     3: 10,
     4: 8,
+    5: 6,
+    6: 4,
   };
   return roundsToWin[numberOfPlayers];
 };
@@ -33,7 +35,7 @@ const checkLostGame = ({ mistakes, accruedLives }: Game) =>
   mistakes >= accruedLives;
 
 const checkWonGame = ({ round, players }: Game) => {
-  return round === getRoundsToWin(players.length);
+  return round === pipe(players, R.size, getRoundsToWin);
 };
 
 const checkNextRound = ({ lastPlayedIndex, dealtCards }: Game) => {
@@ -50,16 +52,17 @@ const checkGameOrRoundOver = (game: Game): Game => {
     : game;
 };
 
-export const playCard = ({ card }: Action) => (game: Game) => {
-  return pipe(
-    card,
-    O.fromNullable,
-    O.map((card): readonly [Game, number] => [game, card]),
-    O.chain(O.fromPredicate(isCorrectOrder)),
-    O.map(handleCorrectOrder),
-    O.getOrElse(() => handleMistake(game)),
-    checkGameOrRoundOver
-  );
-};
+export const playCard = ({ card }: Action) =>
+  (game: Game) => {
+    return pipe(
+      card,
+      O.fromNullable,
+      O.map((card): readonly [Game, number] => [game, card]),
+      O.chain(O.fromPredicate(isCorrectOrder)),
+      O.map(handleCorrectOrder),
+      O.getOrElse(() => handleMistake(game)),
+      checkGameOrRoundOver,
+    );
+  };
 
 // TODO: handle possible game loss; write tests
