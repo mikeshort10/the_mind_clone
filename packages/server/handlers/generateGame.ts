@@ -6,41 +6,31 @@ type PlayerAction = Action & {
   readonly playerName: string;
 };
 
-const hasPlayerName = (
-  action: Action,
-): action is PlayerAction => pipe(action.playerName, O.fromNullable, O.isSome);
+const hasPlayerName = (action: Action): action is PlayerAction =>
+  pipe(action.playerName, O.fromNullable, O.isSome);
 
-export const generateGame = (socketId: string) =>
-  (action: Action): O.Option<Game> =>
-    pipe(
-      action,
-      O.fromPredicate(hasPlayerName),
-      O.map(({ playerName, code }) => ({
-        code,
-        round: 1,
-        dealtCards: [],
-        lastPlayedIndex: -1,
-        players: {
-          [socketId]: {
-            playerName,
-            hand: [],
-            gameOwner: true,
-          },
-        },
-        stars: 3,
-        accruedLives: 3,
-        mistakes: 0,
-        status: "join",
-      })),
-    );
+export const createGame = (socketId: string) => ({
+  playerName,
+  code,
+}: PlayerAction): Game => ({
+  code,
+  round: 1,
+  dealtCards: [],
+  lastPlayedIndex: -1,
+  players: {
+    [socketId]: {
+      playerName,
+      hand: [],
+      gameOwner: true,
+    },
+  },
+  stars: 3,
+  accruedLives: 3,
+  mistakes: 0,
+  status: "join",
+});
 
-//  const safeGenerateGame = (
-//   socketId: string,
-//   action: Action,
-//   orElse: Game,
-// ): Game =>
-//   pipe(
-//     action,
-//     generateGame(socketId),
-//     O.getOrElse(() => orElse),
-//   );
+export const generateGame = (socketId: string) => (
+  action: Action
+): O.Option<Game> =>
+  pipe(action, O.fromPredicate(hasPlayerName), O.map(createGame(socketId)));

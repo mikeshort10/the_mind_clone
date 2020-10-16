@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/lib/function";
 import { getGame } from "./getGame";
 import { O } from "../../../fp";
 
-const createNewPlayer = (playerName: string): Player => ({
+export const createNewPlayer = (playerName: string): Player => ({
   hand: [],
   gameOwner: false,
   playerName,
@@ -20,8 +20,8 @@ export const addPlayerToGame = (games: Games, socketId: string) => {
             ? { ...ps, [socketId]: createNewPlayer(playerName) }
             : ps;
           return { ...game, players };
-        },
-      ),
+        }
+      )
     );
   };
 };
