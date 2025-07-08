@@ -13,3 +13,4 @@ Application for playing the card game, The Mind, by [Pandasaurus Games](https://
 
 gitops
 gitops
+
